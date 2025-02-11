@@ -74,3 +74,4 @@ firebase_options.dart
 .flutter-plugins
 .flutter-plugins-dependencies
 build/
+firebase.json
