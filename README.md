@@ -44,7 +44,7 @@ Ensure Firebase is set up correctly:
 3. Set up Firestore Database & Realtime Database as needed.
 
 ## 📸 Screenshots
-
+📸 Check out all screenshots here 👉 [Full Gallery](ss.md)
 Login page 
 
 <div align="center">
