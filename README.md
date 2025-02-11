@@ -1,21 +1,82 @@
-<<<<<<< HEAD
-# Bus_management_app
-Streamlining College Transportation with Real-Time Tracking and Multi-User Functionality
-=======
-# busbuddy
+Bus Management App
 
-A new Flutter project.
+🚀 Overview
 
-## Getting Started
+Bus Management App is a Flutter-based application designed to help manage bus assignments efficiently. It allows students to view their assigned buses and enables admins to manage assignments easily.
 
-This project is a starting point for a Flutter application.
+📌 Features
 
-A few resources to get you started if this is your first Flutter project:
+User Authentication (Firebase Authentication)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Bus Assignment Management
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
->>>>>>> 19c32b0 (Initial commit)
+Firestore Database Integration
+
+Offline & Online Task Management
+
+Theming Support (Light/Dark Mode)
+
+Bottom Navigation for Easy Navigation
+
+🛠️ Setup & Installation
+
+Clone the repository:
+
+git clone https://github.com/Adith-Senthil-kumar/Bus_management_app.git
+cd Bus_management_app
+
+Install dependencies:
+
+flutter pub get
+
+Setup Firebase:
+
+Download the required Firebase config files:
+
+google-services.json (for Android)
+
+GoogleService-Info.plist (for iOS & macOS)
+
+Place them in:
+
+android/app/ (for Android)
+
+ios/Runner/ (for iOS)
+
+macos/Runner/ (for macOS)
+
+Run the app:
+
+flutter run
+
+🔥 Firebase Configuration
+
+Ensure you have set up Firebase correctly:
+
+Create a Firebase project.
+
+Enable Authentication (Email/Google Sign-In, etc.).
+
+Set up Firestore Database & Realtime Database as needed.
+
+📸 Screenshots
+
+(Include screenshots of your app here)
+
+👨‍💻 Tech Stack
+
+Flutter
+
+Dart
+
+Firebase (Auth, Firestore, Storage)
+
+BLoC Pattern for State Management
+
+
+🙌 Contributors
+
+Adith Senthil Kumar (Lead Developer)
+
+
+
