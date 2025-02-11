@@ -1,83 +1,101 @@
-Bus Management App
+# Bus Management App
 
-🚀 Overview
+## 🚀 Overview
+Bus Management App is a Flutter-based application designed to streamline bus assignment management. It allows students to view their assigned buses and enables administrators to efficiently manage assignments.
 
-Bus Management App is a Flutter-based application designed to help manage bus assignments efficiently. It allows students to view their assigned buses and enables admins to manage assignments easily.
+## 📌 Features
+- **User Authentication** (Firebase Authentication)
+- **Bus Assignment Management**
+- **Firestore Database Integration**
+- **Offline & Online Task Management**
+- **Bottom Navigation for Easy Navigation**
 
-📌 Features
+## 🛠️ Setup & Installation
 
-User Authentication (Firebase Authentication)
-
-Bus Assignment Management
-
-Firestore Database Integration
-
-Offline & Online Task Management
-
-Theming Support (Light/Dark Mode)
-
-Bottom Navigation for Easy Navigation
-
-🛠️ Setup & Installation
-
-Clone the repository:
-
+### Clone the Repository:
+```sh
 git clone https://github.com/Adith-Senthil-kumar/Bus_management_app.git
-
 cd Bus_management_app
+```
 
-Install dependencies:
-
+### Install Dependencies:
+```sh
 flutter pub get
+```
 
-Setup Firebase:
+### Setup Firebase:
+1. Download the required Firebase config files:
+   - `google-services.json` (for Android)
+   - `GoogleService-Info.plist` (for iOS & macOS)
+2. Place them in the following directories:
+   - **Android:** `android/app/`
+   - **iOS:** `ios/Runner/`
+   - **macOS:** `macos/Runner/`
 
-Download the required Firebase config files:
-
-google-services.json (for Android)
-
-GoogleService-Info.plist (for iOS & macOS)
-
-Place them in:
-
-android/app/ (for Android)
-
-ios/Runner/ (for iOS)
-
-macos/Runner/ (for macOS)
-
-Run the app:
-
+### Run the App:
+```sh
 flutter run
+```
 
-🔥 Firebase Configuration
+## 🔥 Firebase Configuration
+Ensure Firebase is set up correctly:
+1. Create a Firebase project.
+2. Enable Authentication (Email/Google Sign-In, etc.).
+3. Set up Firestore Database & Realtime Database as needed.
 
-Ensure you have set up Firebase correctly:
+## 📸 Screenshots
 
-Create a Firebase project.
+Login page 
 
-Enable Authentication (Email/Google Sign-In, etc.).
+<div align="center">
+  <img src="assets/screenshots/1.jpg" width="400"/>
+</div>  
 
-Set up Firestore Database & Realtime Database as needed.
+Admin Portal
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="assets/screenshots/2.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/3.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/4.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/5.jpg" width="200"/></td>
+    </tr>
+  </table>
+</div>  
 
-📸 Screenshots
+User Portal
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="assets/screenshots/s1.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/s2.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/s3.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/s4.jpg" width="200"/></td>
+    </tr>
+  </table>
+</div>  
 
-(Include screenshots of your app here)
+Driver Portal
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="assets/screenshots/d1.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/d2.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/d3.jpg" width="200"/></td>
+      <td><img src="assets/screenshots/d4.jpg" width="200"/></td>
+    </tr>
+  </table>
+</div>  
 
-👨‍💻 Tech Stack
-
-Flutter
-
-Dart
-
-Firebase (Auth, Firestore, Storage)
-
-BLoC Pattern for State Management
 
 
-🙌 Contributors
+## 👨‍💻 Tech Stack
+- **Flutter**
+- **Dart**
+- **Firebase** (Authentication, Firestore, Storage)
+- **BLoC Pattern** for State Management
 
-Adith Senthil Kumar (Lead Developer)
-
+## 🙌 Contributors
+- **Adith Senthil Kumar** (Lead Developer)
 
 
