@@ -48,17 +48,17 @@ Ensure Firebase is set up correctly:
 Login page 
 
 <div align="center">
-  <img src="assets/1.jpg" width="400"/>
+  <img src="assets/1.jpeg" width="400"/>
 </div>  
 
 Admin Portal
 <div align="center">
   <table>
     <tr>
-      <td><img src="assets/2.jpg" width="200"/></td>
-      <td><img src="assets/3.jpg" width="200"/></td>
-      <td><img src="assets/4.jpg" width="200"/></td>
-      <td><img src="assets/5.jpg" width="200"/></td>
+      <td><img src="assets/2.jpeg" width="200"/></td>
+      <td><img src="assets/3.jpeg" width="200"/></td>
+      <td><img src="assets/4.jpeg" width="200"/></td>
+      <td><img src="assets/5.jpeg" width="200"/></td>
     </tr>
   </table>
 </div>  
@@ -67,10 +67,10 @@ User Portal
 <div align="center">
   <table>
     <tr>
-      <td><img src="assets/s1.jpg" width="200"/></td>
-      <td><img src="assets/s2.jpg" width="200"/></td>
-      <td><img src="assets/s3.jpg" width="200"/></td>
-      <td><img src="assets/s4.jpg" width="200"/></td>
+      <td><img src="assets/s1.jpeg" width="200"/></td>
+      <td><img src="assets/s2.jpeg" width="200"/></td>
+      <td><img src="assets/s3.jpeg" width="200"/></td>
+      <td><img src="assets/s4.jpeg" width="200"/></td>
     </tr>
   </table>
 </div>  
@@ -79,10 +79,10 @@ Driver Portal
 <div align="center">
   <table>
     <tr>
-      <td><img src="assets/d1.jpg" width="200"/></td>
-      <td><img src="assets/d2.jpg" width="200"/></td>
-      <td><img src="assets/d3.jpg" width="200"/></td>
-      <td><img src="assets/d4.jpg" width="200"/></td>
+      <td><img src="assets/d1.jpeg" width="200"/></td>
+      <td><img src="assets/d2.jpeg" width="200"/></td>
+      <td><img src="assets/d3.jpeg" width="200"/></td>
+      <td><img src="assets/d4.jpeg" width="200"/></td>
     </tr>
   </table>
 </div>  
