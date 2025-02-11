@@ -23,6 +23,7 @@ Bottom Navigation for Easy Navigation
 Clone the repository:
 
 git clone https://github.com/Adith-Senthil-kumar/Bus_management_app.git
+
 cd Bus_management_app
 
 Install dependencies:
