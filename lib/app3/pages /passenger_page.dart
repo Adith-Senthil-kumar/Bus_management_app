@@ -132,12 +132,7 @@ class _PassengerPageState extends State<PassengerPage> {
                       final student = students[index];
                       final studentName = student['name'] ?? 'N/A';
                       final bool isPresent = student['present'] ?? false;
-                      final String? imageBase64 = student['imageBase64'];
-
-                      Uint8List? imageBytes;
-                      if (imageBase64 != null) {
-                        imageBytes = base64Decode(imageBase64);
-                      }
+                     
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -146,18 +141,7 @@ class _PassengerPageState extends State<PassengerPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListTile(
-                          leading: imageBytes != null
-                              ? CircleAvatar(
-                                  backgroundImage: MemoryImage(imageBytes),
-                                  radius: 30,
-                                )
-                              : CircleAvatar(
-                                  backgroundColor: Colors.grey,
-                                  child: Icon(
-                                    isPresent ? Icons.check : Icons.close,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                          
                           title: Text(
                             studentName,
                             style: const TextStyle(

@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:busbuddy/app2/blocs/navigation_bloc.dart';
-import 'package:busbuddy/app2/blocs/navigation_event.dart';
 import 'package:busbuddy/app2/pages/live_page.dart'; // Ensure you import LivePage
 
 class LocationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Get the current user's email
     final user = FirebaseAuth.instance.currentUser;
     final userEmail = user?.email;
 
@@ -42,17 +38,15 @@ class LocationPage extends StatelessWidget {
             return Center(child: Text('No details found for this user.'));
           }
 
-          // Data is available, fetch assignedBusId
           final student = snapshot.data!.docs.first;
           final data = student.data() as Map<String, dynamic>;
           final assignedBusId = data['assignedBusId'] ?? 'Not assigned';
 
-          // Now fetch the assigned bus details from the 'assignedbus' collection
-          return FutureBuilder<DocumentSnapshot>(
-            future: FirebaseFirestore.instance
+          return StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
                 .collection('assignedbus')
                 .doc(assignedBusId)
-                .get(),
+                .snapshots(),
             builder: (context, busSnapshot) {
               if (busSnapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
@@ -64,70 +58,108 @@ class LocationPage extends StatelessWidget {
                 return Center(child: Text('No bus details found.'));
               }
 
-              // Data from 'assignedbus' collection
               final busData = busSnapshot.data!.data() as Map<String, dynamic>;
-              final stops = busData['stops'] ?? [];
+              final driverId = busData['driverId'] ?? 'No driver assigned';
 
-              return SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Bus Stops:',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 10),
-                      stops.isEmpty
-                          ? Text('No stops available.')
-                          : Column(
-                              children: stops.map<Widget>((stop) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16.0), // Increased vertical padding
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Circle with black border
-                                      CircleAvatar(
-                                        radius: 12,
-                                        backgroundColor: Colors.transparent,
-                                        child: CircleAvatar(
-                                          radius: 10,
-                                          backgroundColor: Colors.black,
-                                        ),
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('stops_status')
+                    .where('driverId', isEqualTo: driverId)
+                    .snapshots(),
+                builder: (context, stopsStatusSnapshot) {
+                  if (stopsStatusSnapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (stopsStatusSnapshot.hasError) {
+                    return Center(child: Text('Error: ${stopsStatusSnapshot.error}'));
+                  }
+                  if (!stopsStatusSnapshot.hasData || stopsStatusSnapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('No stops status found for this driver.'));
+                  }
+
+                  final stopsStatusDoc = stopsStatusSnapshot.data!.docs.first;
+                  final stopsStatusData = stopsStatusDoc.data() as Map<String, dynamic>;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ListView.builder(
+                      itemCount: stopsStatusData['stopsWithLocations'].length,
+                      itemBuilder: (context, index) {
+                        final stop = stopsStatusData['stopsWithLocations'][index];
+                        String stopName = stop['name'] ?? 'Unknown Stop';
+                        String status = stop['status'] ?? 'on the way';
+                        Color statusColor;
+
+                        switch (status) {
+                          case 'reached':
+                            statusColor = Colors.green;
+                            break;
+                          case 'next':
+                            statusColor = Colors.yellow;
+                            break;
+                          default:
+                            statusColor = Colors.blue;
+                            status = 'on the way';
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Status Circle (Left)
+                              Container(
+                                width: 20,
+                                height: 20,
+                                margin: EdgeInsets.only(right: 16),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: statusColor,
+                                ),
+                              ),
+
+                              // Stop Name and Status (Centered)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      stopName,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      SizedBox(width: 16), // Space between the circle and text
-                                      // Stop name displayed next to the circle
-                                      Container(
-                                        width: MediaQuery.of(context).size.width * 0.6,
-                                        child: Center(
-                                          child: Text(
-                                            stop,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                            textAlign: TextAlign.center, // Center the text
-                                          ),
-                                        ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      status.toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: statusColor,
                                       ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                    ],
-                  ),
-                ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
               );
             },
           );
         },
       ),
+      
+    
+  
+
       // Floating Action Button with location icon
       floatingActionButton: Container(
         alignment: Alignment.bottomRight, // Control the position here

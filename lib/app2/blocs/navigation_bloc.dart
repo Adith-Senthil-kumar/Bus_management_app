@@ -1,14 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'navigation_event.dart';
-import 'navigation_state.dart';
+import 'package:busbuddy/app2/blocs/navigation_event.dart';
+import 'package:busbuddy/app2/blocs/navigation_state.dart';
 
 class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
  
-  NavigationBloc() : super(HomeState()) {
+  NavigationBloc() : super(Home1State()) {
     // Define event-to-state mappings
     
     on<NavigateToBusDetails>((event, emit) => emit(BusDetailsState()));
-    on<NavigateToHome>((event, emit) => emit(HomeState()));
+    on<NavigateToHome1>((event, emit) => emit(Home1State()));
     on<NavigateToLocation>((event, emit) => emit(LocationState()));
     on<NavigateToSearch>((event, emit) => emit(SearchState()));
     on<NavigateToNotification>((event, emit) => emit(NotificationState()));

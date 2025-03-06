@@ -1,6 +1,6 @@
 abstract class NavigationEvent {}
 
-class NavigateToHome extends NavigationEvent {}
+class NavigateToHome2 extends NavigationEvent {}
 class NavigateToaccount extends NavigationEvent {}
 class NavigateTocontacts extends NavigationEvent {}
 class NavigateTofeedback extends NavigationEvent {}

@@ -1,15 +1,10 @@
-import 'package:busbuddy/login_pages/login_bloc.dart';
-import 'package:busbuddy/login_pages/login_page.dart';
+
 import 'package:busbuddy/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:busbuddy/app3/blocs/navigation_bloc.dart';
 import 'package:busbuddy/app3/blocs/navigation_event.dart';
-import 'package:busbuddy/app3/blocs/navigation_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-
-
 
 class SettingsPage extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -29,7 +24,7 @@ class SettingsPage extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async {
         // Handle back navigation when the back button is pressed
-        context.read<NavigationBloc>().add(NavigateToHome());
+        context.read<NavigationBloc>().add(NavigateToHome2());
         Navigator.pop(context); // Remove this page from the navigation stack
         return Future.value(false); // Prevent default back button action
       },
@@ -55,7 +50,7 @@ class SettingsPage extends StatelessWidget {
             icon: Icon(Icons.arrow_back,
                 color: Colors.white), // Make back button white
             onPressed: () {
-              context.read<NavigationBloc>().add(NavigateToHome());
+              context.read<NavigationBloc>().add(NavigateToHome2());
               Navigator.pop(
                   context); // Remove this page from the navigation stack
             },
@@ -64,13 +59,6 @@ class SettingsPage extends StatelessWidget {
         body: ListView(
           padding: EdgeInsets.all(16),
           children: [
-            
-            
-            
-            
-            
-            
-            
             // Logout Option
             ListTile(
               leading: Icon(Icons.exit_to_app, color: Colors.red),
@@ -92,9 +80,10 @@ class SettingsPage extends StatelessWidget {
     await FirebaseAuth.instance.signOut();
 
     // Navigate back to the main app entry point (where the login page is)
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const BusBuddyApp()),
+      MaterialPageRoute(builder: (context) => BusBuddyApp()),
+      (Route<dynamic> route) => false,
     );
   }
 }

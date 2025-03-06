@@ -77,7 +77,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
     return WillPopScope(
       onWillPop: () async {
-        context.read<NavigationBloc>().add(NavigateToHome());
+        context.read<NavigationBloc>().add(NavigateToHome1());
         Navigator.pop(context);
         return Future.value(false);
       },
@@ -103,7 +103,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              context.read<NavigationBloc>().add(NavigateToHome());
+              context.read<NavigationBloc>().add(NavigateToHome1());
               Navigator.pop(context);
             },
           ),

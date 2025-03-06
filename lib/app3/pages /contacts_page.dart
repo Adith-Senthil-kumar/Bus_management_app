@@ -21,14 +21,42 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   // Function to fetch contacts from Firestore
-  Future<void> _fetchContacts() async {
+Future<void> _fetchContacts() async {
+  try {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    QuerySnapshot snapshot = await firestore.collection('contacts').get();
-    setState(() {
-      _contacts = snapshot.docs;
-    });
-  }
+    QuerySnapshot snapshot;
 
+    // Try fetching from cache first
+    try {
+      snapshot = await firestore
+          .collection('contacts')
+          .get(const GetOptions(source: Source.cache));
+
+      if (snapshot.docs.isNotEmpty) {
+        print("Fetched contacts from cache");
+        _updateContacts(snapshot);
+        return;
+      }
+    } catch (cacheError) {
+      print("Cache miss, fetching from Firestore...");
+    }
+
+    // If cache fails, fetch fresh data from Firestore
+    snapshot = await firestore.collection('contacts').get();
+    print("Fetched contacts from Firestore");
+    _updateContacts(snapshot);
+
+  } catch (e) {
+    print('Error fetching contacts: $e');
+  }
+}
+
+// Helper function to update state
+void _updateContacts(QuerySnapshot snapshot) {
+  setState(() {
+    _contacts = snapshot.docs;
+  });
+}
   // Function to launch the phone dialer
   Future<void> _launchPhoneDialer(String? phoneNumber) async {
     if (phoneNumber == null || phoneNumber.isEmpty) {
@@ -65,7 +93,7 @@ class _ContactsPageState extends State<ContactsPage> {
     return WillPopScope(
       onWillPop: () async {
         // Handle back navigation
-        context.read<NavigationBloc>().add(NavigateToHome());
+        context.read<NavigationBloc>().add(NavigateToHome2());
         Navigator.pop(context); // Remove this page from the navigation stack
         return Future.value(false); // Prevent the default back action
       },
@@ -93,7 +121,7 @@ class _ContactsPageState extends State<ContactsPage> {
             icon: Icon(Icons.arrow_back, color: Colors.white), // Back button
             onPressed: () {
               // Handle back navigation
-              context.read<NavigationBloc>().add(NavigateToHome());
+              context.read<NavigationBloc>().add(NavigateToHome2());
               Navigator.pop(
                   context); // Remove this page from the navigation stack
             },

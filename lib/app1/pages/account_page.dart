@@ -4,30 +4,45 @@ import 'package:busbuddy/app1/blocs/navigation_bloc.dart';
 import 'package:busbuddy/app1/blocs/navigation_event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:convert'; // Import for Base64 decoding
-import 'dart:typed_data'; // Import for Uint8List
+
 
 class AccountPage extends StatelessWidget {
   Future<Map<String, dynamic>> _fetchUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception('No user logged in');
-    }
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    throw Exception('No user logged in');
+  }
 
-    // Fetch data from the 'admins' collection based on the logged-in user's email
+  try {
+    // Try reading from cache first
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await FirebaseFirestore.instance
-            .collection('admins') // Fetch from the 'admins' collection
+            .collection('admins')
             .where('email', isEqualTo: user.email)
             .limit(1)
-            .get();
+            .get(const GetOptions(source: Source.cache));
 
     if (snapshot.docs.isNotEmpty) {
       return snapshot.docs.first.data();
-    } else {
-      throw Exception('Admin not found');
     }
+  } catch (e) {
+    print('Cache miss, fetching from server...');
   }
+
+  // If cache fails, fetch fresh data
+  QuerySnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance
+          .collection('admins')
+          .where('email', isEqualTo: user.email)
+          .limit(1)
+          .get();
+
+  if (snapshot.docs.isNotEmpty) {
+    return snapshot.docs.first.data();
+  } else {
+    throw Exception('Admin not found');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -84,27 +99,16 @@ class AccountPage extends StatelessWidget {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (snapshot.hasData) {
               var adminData = snapshot.data!;
-              String base64Image = adminData['profile_picture'] ?? '';
+             
 
-              // Decode the base64 image
-              Uint8List? decodedImage =
-                  base64Image.isNotEmpty ? base64Decode(base64Image) : null;
+              
 
               return Center(
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundColor: Colors.blue.shade200,
-                        backgroundImage: decodedImage != null
-                            ? MemoryImage(decodedImage)
-                            : null,
-                        child: decodedImage == null
-                            ? Icon(Icons.person, size: 60, color: Colors.white)
-                            : null,
-                      ),
+                      
                       SizedBox(height: 16),
                       Text(
                         adminData['name'] ?? 'No Name',

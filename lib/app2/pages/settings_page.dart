@@ -29,7 +29,7 @@ class SettingsPage extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async {
         // Handle back navigation when the back button is pressed
-        context.read<NavigationBloc>().add(NavigateToHome());
+        context.read<NavigationBloc>().add(NavigateToHome1());
         Navigator.pop(context); // Remove this page from the navigation stack
         return Future.value(false); // Prevent default back button action
       },
@@ -55,7 +55,7 @@ class SettingsPage extends StatelessWidget {
             icon: Icon(Icons.arrow_back,
                 color: Colors.white), // Make back button white
             onPressed: () {
-              context.read<NavigationBloc>().add(NavigateToHome());
+              context.read<NavigationBloc>().add(NavigateToHome1());
               Navigator.pop(
                   context); // Remove this page from the navigation stack
             },
@@ -88,13 +88,14 @@ class SettingsPage extends StatelessWidget {
 
   // Logout logic: clear session data, navigate to login page, etc.
 
-  void _logout(BuildContext context) async {
+ void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
 
     // Navigate back to the main app entry point (where the login page is)
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const BusBuddyApp()),
+      MaterialPageRoute(builder: (context) => BusBuddyApp()),
+      (Route<dynamic> route) => false,
     );
   }
 }

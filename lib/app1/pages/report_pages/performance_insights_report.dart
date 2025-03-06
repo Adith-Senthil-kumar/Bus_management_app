@@ -19,7 +19,7 @@ class _PerformanceInsightsReportState extends State<PerformanceInsightsReport> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Buttons to toggle between bus and driver details
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 ElevatedButton(

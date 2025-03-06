@@ -11,7 +11,6 @@ import 'settings_pages/profile_settings_page.dart';
 
 import 'settings_pages/download_page.dart';
 
-
 class SettingsPage extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
@@ -79,7 +78,7 @@ class SettingsPage extends StatelessWidget {
               },
             ),
             Divider(),
-            
+
             ListTile(
               leading: Icon(Icons.download, color: Color(0xFF28497B)),
               title: Text('Download'),
@@ -93,8 +92,7 @@ class SettingsPage extends StatelessWidget {
                 );
               },
             ),
-            
-            
+
             Divider(),
             // Logout Option
             ListTile(
@@ -117,9 +115,10 @@ class SettingsPage extends StatelessWidget {
     await FirebaseAuth.instance.signOut();
 
     // Navigate back to the main app entry point (where the login page is)
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const BusBuddyApp()),
+      MaterialPageRoute(builder: (context) => BusBuddyApp()),
+      (Route<dynamic> route) => false,
     );
   }
 }

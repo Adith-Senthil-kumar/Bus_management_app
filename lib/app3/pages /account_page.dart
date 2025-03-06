@@ -11,24 +11,43 @@ class AccountPage extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<DocumentSnapshot?> _fetchDriverDetails(String email) async {
+  try {
+    QuerySnapshot querySnapshot;
+
+    // Try fetching from cache first
     try {
-      QuerySnapshot querySnapshot = await _firestore
+      querySnapshot = await _firestore
           .collection('drivers')
           .where('driverEmail', isEqualTo: email)
           .limit(1)
-          .get();
+          .get(const GetOptions(source: Source.cache));
 
       if (querySnapshot.docs.isNotEmpty) {
+        print("Fetched driver details from cache");
         return querySnapshot.docs.first;
-      } else {
-        return null; // No matching document found
       }
-    } catch (e) {
-      debugPrint('Error fetching driver details: $e');
-      return null;
+    } catch (cacheError) {
+      print("Cache miss, fetching from Firestore...");
     }
-  }
 
+    // If cache fails, fetch fresh data from Firestore
+    querySnapshot = await _firestore
+        .collection('drivers')
+        .where('driverEmail', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      print("Fetched driver details from Firestore");
+      return querySnapshot.docs.first;
+    } else {
+      return null; // No matching document found
+    }
+  } catch (e) {
+    debugPrint('Error fetching driver details: $e');
+    return null;
+  }
+}
   Uint8List _decodeBase64(String base64String) {
     return base64Decode(base64String);
   }
@@ -51,7 +70,7 @@ class AccountPage extends StatelessWidget {
 
     return WillPopScope(
       onWillPop: () async {
-        context.read<NavigationBloc>().add(NavigateToHome());
+        context.read<NavigationBloc>().add(NavigateToHome2());
         Navigator.pop(context);
         return false;
       },
@@ -75,7 +94,7 @@ class AccountPage extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              context.read<NavigationBloc>().add(NavigateToHome());
+              context.read<NavigationBloc>().add(NavigateToHome2());
               Navigator.pop(context);
             },
           ),

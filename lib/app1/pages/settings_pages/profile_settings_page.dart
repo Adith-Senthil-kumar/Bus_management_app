@@ -38,7 +38,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       if (docSnapshot.docs.isNotEmpty) {
         var docData = docSnapshot.docs[0].data();
         setState(() {
-          _base64Image = docData['profile_picture'];
+          
           _name = docData['name'];
           _phone = docData['phone'];
           _email = docData['email'];
@@ -61,18 +61,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     }
   }
 
-  // Method to pick an image from the gallery
-  Future<void> _pickImage() async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      final bytes = imageFile.readAsBytesSync();
-      setState(() {
-        _base64Image = base64Encode(bytes);
-      });
-    }
-  }
-
+  
   // Method to update the profile data in Firestore
   Future<void> _updateProfileData() async {
     try {
@@ -85,7 +74,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       if (docSnapshot.docs.isNotEmpty) {
         var docId = docSnapshot.docs[0].id;
         await FirebaseFirestore.instance.collection('admins').doc(docId).update({
-          'profile_picture': _base64Image,
+          
           'name': _nameController.text,
           'phone': _phoneController.text,
           'email': _emailController.text,
@@ -147,15 +136,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      GestureDetector(
-                        onTap: _pickImage, // Open image picker when tapped
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: _base64Image == null
-                              ? AssetImage('assets/placeholder.png')
-                              : MemoryImage(base64Decode(_base64Image!)),
-                        ),
-                      ),
+                      
                       SizedBox(height: 20),
                       // Editable name field
                       TextField(

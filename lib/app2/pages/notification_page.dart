@@ -27,7 +27,7 @@ class NotificationPage extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async {
         // Handle back navigation
-        context.read<NavigationBloc>().add(NavigateToHome());
+        context.read<NavigationBloc>().add(NavigateToHome1());
         Navigator.pop(context); // Remove this page from the navigation stack
         return Future.value(false); // Prevent the default back action
       },
@@ -54,7 +54,7 @@ class NotificationPage extends StatelessWidget {
             icon: Icon(Icons.arrow_back, color: Colors.white), // Back button
             onPressed: () {
               // Handle back navigation
-              context.read<NavigationBloc>().add(NavigateToHome());
+              context.read<NavigationBloc>().add(NavigateToHome1());
               Navigator.pop(context); // Navigate back
             },
           ),

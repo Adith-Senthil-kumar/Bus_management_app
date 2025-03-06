@@ -1,6 +1,6 @@
 abstract class NavigationState {}
 
-class HomeState extends NavigationState {}
+class Home1State extends NavigationState {}
 
 class BusDetailsState extends NavigationState {}
 

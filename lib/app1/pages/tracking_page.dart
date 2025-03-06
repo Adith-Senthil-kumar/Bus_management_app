@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:busbuddy/app1/blocs/navigation_bloc.dart';
 import 'package:busbuddy/app1/blocs/navigation_event.dart';
-import 'package:flutter_map/flutter_map.dart'; // Import FlutterMap
-import 'package:latlong2/latlong.dart'; // Import for LatLng
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class TrackingPage extends StatefulWidget {
   @override
@@ -13,9 +15,29 @@ class TrackingPage extends StatefulWidget {
 }
 
 class _TrackingPageState extends State<TrackingPage> {
-  MapController mapController = MapController();
-  List<Marker> _markers = [];
-  LatLng? driverLocation;
+  // Default to a reasonable location until we get real data
+  LatLng driverLocation = LatLng(0, 0);
+  bool isMapReady = false;
+
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+
+  @override
+  void initState() {
+    super.initState();
+    // To ensure we have a default location for the map
+    isMapReady = true;
+  }
+
+  void _focusOnPin() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: driverLocation,
+        zoom: 17.0, // Adjust for closer or wider zoom
+      ),
+    ));
+  }
 
   // Stream to listen for real-time updates to the driver's location
   Stream<DocumentSnapshot> _getDriverLocationStream(String driverId) {
@@ -41,7 +63,9 @@ class _TrackingPageState extends State<TrackingPage> {
         print('Bus Details: ${busData['busDetails']}');
         print('Driver ID: $driverId');
 
-        if (driverId.isNotEmpty) {
+        if (driverId != null &&
+            driverId.isNotEmpty &&
+            driverId != "No driver assigned") {
           // Listen to the driver's location updates in real-time
           _getDriverLocationStream(driverId).listen((driverSnapshot) {
             if (driverSnapshot.exists) {
@@ -51,17 +75,31 @@ class _TrackingPageState extends State<TrackingPage> {
                 setState(() {
                   driverLocation =
                       LatLng(location.latitude, location.longitude);
+                  // Call _focusOnPin to center the map on the new location
+                  _focusOnPin();
                 });
-
-                // Animate the map to the new location
-                mapController.move(driverLocation!, 18.0);
               }
             }
           });
+        } else {
+          // Show a snackbar to inform the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('No driver assigned to this bus.'),
+              duration: Duration(seconds: 3),
+            ),
+          );
         }
       }
     } catch (e) {
       print('Error fetching bus details: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading driver location: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -103,65 +141,56 @@ class _TrackingPageState extends State<TrackingPage> {
                   context); // Remove this page from the navigation stack
             },
           ),
-          title: Center(
-            child: Padding(
-              padding: EdgeInsets.only(right: 20.0), // Add padding to the right
-              child: Text(
-                'Live Tracking',
-                style: TextStyle(
-                  color: Colors.white, // Set the title color to white
-                  fontWeight: FontWeight.bold, // Optional: Make the title bold
-                ),
-              ),
+          title: Text(
+            'Live Tracking',
+            style: TextStyle(
+              color: Colors.white, // Set the title color to white
+              fontWeight: FontWeight.bold, // Optional: Make the title bold
             ),
           ),
+          centerTitle: true,
         ),
         body: Column(
           children: [
-            // Map Section
-            Expanded(
-              child: FlutterMap(
-                mapController: mapController, // Pass the map controller here
-                options: MapOptions(
-                  initialCenter:
-                      driverLocation ?? LatLng(0.0, 0.0), // Fallback if null
-                  initialZoom: 18.0, // Set zoom level
-                ),
+            // Map Section - Give it a fixed height or flexible fraction
+            Container(
+              height: MediaQuery.of(context).size.height *
+                  0.5, // 50% of screen height
+              child: Stack(
                 children: [
-                  TileLayer(
-                    urlTemplate:
-                        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    subdomains: ['a', 'b', 'c'],
-                  ),
-                  MarkerLayer(
-                    markers: [
+                  GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: CameraPosition(
+                      target: driverLocation,
+                      zoom: 16.0,
+                    ),
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                    },
+                    markers: {
                       Marker(
-                        width: 80.0,
-                        height: 80.0,
-                        point: driverLocation ??
-                            LatLng(0.0, 0.0), // Fallback if null
-                        child: TweenAnimationBuilder<LatLng>(
-                          tween: LatLngTween(
-                              begin: LatLng(0.0, 0.0),
-                              end: driverLocation ?? LatLng(0.0, 0.0)),
-                          duration:
-                              Duration(seconds: 3), // Duration of the animation
-                          builder: (context, LatLng currentLatLng, child) {
-                            return Icon(
-                              Icons.location_on,
-                              size: 40.0,
-                              color: Colors.red,
-                            );
-                          },
-                        ),
+                        markerId: MarkerId('driver'),
+                        position: driverLocation,
+                        icon: BitmapDescriptor.defaultMarkerWithHue(
+                            BitmapDescriptor.hueBlue),
                       ),
-                    ],
+                    },
+                  ),
+                  // Correctly positioned button inside the Stack
+                  Positioned(
+                    bottom: 20,
+                    left: 20,
+                    child: FloatingActionButton(
+                      onPressed: _focusOnPin,
+                      backgroundColor: Colors.blue,
+                      child: Icon(Icons.my_location, color: Colors.white),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // StreamBuilder to fetch data from Firestore
+            // Bus List Section
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
@@ -173,7 +202,7 @@ class _TrackingPageState extends State<TrackingPage> {
                   }
 
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(child: Text('No data available'));
+                    return Center(child: Text('No buses available'));
                   }
 
                   var documents = snapshot.data!.docs;
@@ -198,7 +227,7 @@ class _TrackingPageState extends State<TrackingPage> {
                             contentPadding: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 15),
                             title: Text(
-                              'Bus Number: ${doc['busNumber']}',
+                              'Bus Number: ${doc['busNumber'] ?? "Unknown"}',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.blue[800]),
@@ -206,19 +235,32 @@ class _TrackingPageState extends State<TrackingPage> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Driver Name: ${doc['driverName']}'),
-                                Text('Route Name: ${doc['routeName']}'),
+                                Text(
+                                    'Driver Name: ${doc['driverName'] ?? "Not assigned"}'),
+                                Text(
+                                    'Route Name: ${doc['routeName'] ?? "No route"}'),
                               ],
                             ),
-                            trailing: IconButton(
+                            trailing: ElevatedButton.icon(
                               icon: Icon(
                                 Icons.location_on,
-                                color: Colors
-                                    .purple, // Purple color for the location icon
+                                color: Colors.white,
+                              ),
+                              label: Text('Track'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.purple,
+                                foregroundColor: Colors.white,
                               ),
                               onPressed: () {
-                                _fetchAssignedBusDetails(busId,
-                                    context); // Pass busId to fetch details
+                                _fetchAssignedBusDetails(busId, context);
+                                // Show a snackbar to inform the user
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        'Tracking bus ${doc['busNumber'] ?? "Unknown"}'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
                               },
                             ),
                           ),

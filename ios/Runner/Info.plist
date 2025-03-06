@@ -20,10 +20,6 @@
     <string>$(FLUTTER_BUILD_NAME)</string>
     <key>CFBundleSignature</key>
     <string>????</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-<string>We need access to save files to your photo library.</string>
-<key>NSDocumentDirectoryUsageDescription</key>
-<string>We need access to save files to your documents folder.</string>
     <key>CFBundleVersion</key>
     <string>$(FLUTTER_BUILD_NUMBER)</string>
     <key>LSRequiresIPhoneOS</key>
@@ -49,15 +45,36 @@
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+
+    <!-- ✅ Location Permissions -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need access to your location to provide real-time tracking.</string>
+    
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We need access to your location to track your movement even when the app is in the background.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app needs continuous access to your location for real-time tracking.</string>
+
+    <!-- ✅ Background Location Mode -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>fetch</string>
+    </array>
+
+    <!-- ✅ Camera & NFC Permissions -->
+    <key>NSCameraUsageDescription</key>
+    <string>We need camera access to take photos.</string>
+
+    <key>NFCReaderUsageDescription</key>
+    <string>This app uses NFC to scan and interact with NFC tags.</string>
+
+    <!-- ✅ Storage & Photo Library Permissions -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library to pick and save photos.</string>
+
+    <key>NSDocumentDirectoryUsageDescription</key>
+    <string>We need access to save files to your documents folder.</string>
 </dict>
 </plist>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>We need access to your location to provide real-time tracking.</string>
-<key>NSLocationAlwaysUsageDescription</key>
-<string>We need access to your location to track your movement even when the app is in the background.</string>
-<key>NSCameraUsageDescription</key>
-<string>We need camera access to take photos</string>
-<key>Privacy - NFC Scan Usage Description</key>
-<string>This app uses NFC to scan and interact with NFC tags.</string>
-<key>NSPhotoLibraryUsageDescription</key>
-<string>We need access to your photo library to pick photos</string>

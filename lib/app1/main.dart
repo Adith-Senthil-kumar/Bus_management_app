@@ -14,15 +14,9 @@ import 'package:busbuddy/app1/pages/settings_page.dart';
 import 'package:busbuddy/app1/pages/tracking_page.dart';
 import 'package:busbuddy/app1/pages/userfeedback_page.dart';
 import 'package:busbuddy/app1/pages/usermanagement_page.dart';
-import 'package:busbuddy/app1/pages/contact_page.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-
-
 
 void main() {
-  
   runApp(
     MultiBlocProvider(
       providers: [
@@ -30,7 +24,6 @@ void main() {
       ],
       child: Level1app(),
     ),
-    
   );
 }
 
@@ -53,10 +46,6 @@ class Level1app extends StatelessWidget {
   }
 }
 
-
-
-
-
 class MainPage extends StatefulWidget {
   @override
   _MainPageState createState() => _MainPageState();
@@ -67,9 +56,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     // Gradient definition
     final gradient = LinearGradient(
       begin: Alignment.centerRight,
@@ -83,311 +69,286 @@ class _MainPageState extends State<MainPage> {
     );
     return WillPopScope(
       onWillPop: () async {
-        final currentState = context.read<NavigationBloc>().state;
-        if (currentState is! HomeState) {
-          context.read<NavigationBloc>().add(NavigateToHome());
-          return false; // Prevents the app from popping
-        }
-        return true; // Allows the app to exit if already on the home page
+        // Show a dialog to confirm exit instead of going back
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Do you want to exit?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        );
+        return shouldPop ?? false;
       },
       child: Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomInset:
             false, // Ensures the body resizes when keyboard appears
         backgroundColor: Color.fromARGB(255, 40, 73, 123),
+
         drawer: Drawer(
           child: Container(
-            color: Colors.white, // Set the background of the ListView to white
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                // Top gradient section
-                Container(
-                  height: MediaQuery.of(context).size.height *
-                      0.268, // Dynamic header height
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerRight,
-                      end: Alignment.centerLeft,
-                      colors: [
-                        Color(0xFF3764A7),
-                        Color(0xFF28497B),
-                        Color(0xFF152741),
-                      ],
-                      stops: [0.36, 0.69, 1.0],
-                    ),
-                  ),
-                  child: LayoutBuilder(
+            color: Colors.white, // Background color
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Header section with full width
+                  LayoutBuilder(
                     builder: (context, constraints) {
-                      final height = constraints.maxHeight;
-                      final iconSize =
-                          height * 0.35; // Icon size 40% of the header height
-                      final fontSize =
-                          height * 0.18; // Font size 18% of the header height
-                      final spacing =
-                          height * 0.05; // Spacing between icon and text
+                      final double maxWidth = constraints.maxWidth;
+                      final double height = (maxWidth * 0.5)
+                          .clamp(150.0, 250.0); // Clamped height
+                      final double iconSize = height * 0.3;
+                      final double fontSize = (height * 0.18)
+                          .clamp(14.0, 24.0); // Clamped font size
 
-                      return Padding(
-                        padding: EdgeInsets.all(
-                            height * 0.1), // Padding based on height
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.directions_bus,
-                              color: Colors.white,
-                              size: iconSize,
+                      return SizedBox(
+                        width: double.infinity, // Ensures full width
+                        height: height,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerRight,
+                              end: Alignment.centerLeft,
+                              colors: [
+                                Color(0xFF3764A7),
+                                Color(0xFF28497B),
+                                Color(0xFF152741),
+                              ],
+                              stops: [0.36, 0.69, 1.0],
                             ),
-                            SizedBox(height: spacing),
-                            Text(
-                              'Bus Buddy',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          ),
+                          child: SafeArea(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.directions_bus,
+                                  color: Colors.white,
+                                  size: iconSize,
+                                ),
+                                SizedBox(
+                                    height: height * 0.05), // Dynamic spacing
+                                FittedBox(
+                                  // Prevents text overflow
+                                  child: Text(
+                                    'Bus Buddy',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: fontSize,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       );
                     },
                   ),
-                ),
-                // List Items below the header
-                _buildDrawerItem(
-                  context,
-                  Icons.notification_add,
-                  'Notification management',
-                  () {
-                    context
-                        .read<NavigationBloc>()
-                        .add(NavigateTonotification());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NotificationPage()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  Icons.map,
-                  'Tracking',
-                  () {
-                    context.read<NavigationBloc>().add(NavigateTotracking());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TrackingPage()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  Icons.feedback,
-                  'User FeedBack',
-                  () {
-                    context.read<NavigationBloc>().add(NavigateTofeedback());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => UserfeedbackPage()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  Icons.report,
-                  'Reports',
-                  () {
-                    context.read<NavigationBloc>().add(NavigateToreport());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ReportsPage()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  Icons.person,
-                  'User management',
-                  () {
-                    context.read<NavigationBloc>().add(NavigateTouser());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => UsermanagementPage()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  Icons.contacts,
-                  'Contacts management',
-                  () {
-                    context.read<NavigationBloc>().add(NavigateTocontact());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ContactPage()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  Icons.settings,
-                  'Settings',
-                  () {
-                    context.read<NavigationBloc>().add(NavigateTosettings());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SettingsPage()),
-                    );
-                  },
-                ),
-              ],
+                  // List Items below the header
+                  _buildDrawerItem(
+                    context,
+                    Icons.notification_add,
+                    'Notification management',
+                    () {
+                      context
+                          .read<NavigationBloc>()
+                          .add(NavigateTonotification());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationPage()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.map,
+                    'Tracking',
+                    () {
+                      context.read<NavigationBloc>().add(NavigateTotracking());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TrackingPage()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.feedback,
+                    'User Feedback',
+                    () {
+                      context.read<NavigationBloc>().add(NavigateTofeedback());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UserfeedbackPage()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.report,
+                    'Reports',
+                    () {
+                      context.read<NavigationBloc>().add(NavigateToreport());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ReportsPage()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.person,
+                    'User management',
+                    () {
+                      context.read<NavigationBloc>().add(NavigateTouser());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UsermanagementPage()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.contacts,
+                    'Contacts management',
+                    () {
+                      context.read<NavigationBloc>().add(NavigateTocontact());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ContactPage()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.settings,
+                    'Settings',
+                    () {
+                      context.read<NavigationBloc>().add(NavigateTosettings());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SettingsPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(screenHeight * 0.234), // Custom height
+          preferredSize:
+              Size.fromHeight(kToolbarHeight), // Standard AppBar height
           child: Container(
             decoration: BoxDecoration(
               gradient: gradient, // Your gradient here
             ),
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              automaticallyImplyLeading: false,
-              flexibleSpace: LayoutBuilder(
-                builder: (context, constraints) {
-                  final height = constraints.maxHeight;
-                  final iconSize =
-                      height * 0.15; // Icon size as 15% of the AppBar height
-                  final fontSize =
-                      height * 0.15; // Font size as 18% of the AppBar height
-                  final verticalPadding =
-                      height * 0.13; // Vertical padding as 10% of AppBar height
-
-                  return Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: height * 0.05, vertical: verticalPadding),
-                    child: Column(
-                      children: [
-                        // Row to manage the layout of both the menu and account icons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment
-                              .spaceBetween, // Distribute space between menu and account icons
-                          children: [
-                            // Menu Button at the top (on the left)
-                            IconButton(
-                              icon: Icon(Icons.menu, size: iconSize),
-                              color: Colors.white,
-                              tooltip: 'Menu',
-                              onPressed: () {
-                                _scaffoldKey.currentState?.openDrawer();
-                              },
-                            ),
-                            // Account Button at the top (on the right)
-                            IconButton(
-                              icon: Icon(Icons.person, size: iconSize),
-                              color: Colors.white,
-                              tooltip: 'Account details',
-                              onPressed: () {
-                                context
-                                    .read<NavigationBloc>()
-                                    .add(NavigateToaccount());
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AccountPage()),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        // Centered content (bus icon and title)
-                        Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.directions_bus, // Bus icon
-                                color: Colors.white,
-                                size: iconSize *
-                                    1.78, // Icon size doubled for bus icon
-                              ),
-                              SizedBox(
-                                  height: height *
-                                      0.01), // Adjust spacing based on height
-                              Text(
-                                'BusBuddy',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize:
-                                      fontSize, // Font size adjusted based on height
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+            child: SafeArea(
+              child: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+                leading: IconButton(
+                  icon: Icon(Icons.menu),
+                  color: Colors.white,
+                  tooltip: 'Menu',
+                  onPressed: () {
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
+                ),
+                title: Text(
+                  'BusBuddy',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                centerTitle: true,
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.person),
+                    color: Colors.white,
+                    tooltip: 'Account details',
+                    onPressed: () {
+                      context.read<NavigationBloc>().add(NavigateToaccount());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AccountPage()),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
         ),
         extendBody: true,
-       body: BlocBuilder<NavigationBloc, NavigationState>(
-  builder: (context, state) {
-    // Based on the state, return the appropriate page
-    if (state is BusState) {
-      return BusmanagementPage();
-    } else if (state is HomeState) {
-      return HomePage();
-    } else if (state is AccountState) {
-      return AccountPage();
-    } else if (state is NotificationState) {
-      return NotificationPage();
-    } else if (state is SettingsState) {
-      return SettingsPage();
-    } else if (state is ReportState) {
-      return ReportsPage();
-    } else if (state is RouteState) {
-      return RoutemanagementPage();
-    } else if (state is TrackingState) {
-      return TrackingPage();
-    } else if (state is FeedbackState) {
-      return UserfeedbackPage();
-    } else if (state is UserState) {
-      return UsermanagementPage();
-    } else if (state is ContactState) {
-      return ContactPage();
-    } else {
-      // A more robust fallback for unknown states
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.red, size: 50),
-            SizedBox(height: 20),
-            Text('Unknown State', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Optionally provide a way to navigate back or refresh the state
-                Navigator.pop(context); // Example: Go back to the previous screen
-              },
-              child: Text('Go Back'),
-            ),
-          ],
+        body: BlocBuilder<NavigationBloc, NavigationState>(
+          builder: (context, state) {
+            // Based on the state, return the appropriate page
+            if (state is BusState) {
+              return BusmanagementPage();
+            } else if (state is HomeState) {
+              return HomePage();
+            } else if (state is AccountState) {
+              return AccountPage();
+            } else if (state is NotificationState) {
+              return NotificationPage();
+            } else if (state is SettingsState) {
+              return SettingsPage();
+            } else if (state is ReportState) {
+              return ReportsPage();
+            } else if (state is RouteState) {
+              return RoutemanagementPage();
+            } else if (state is TrackingState) {
+              return TrackingPage();
+            } else if (state is FeedbackState) {
+              return UserfeedbackPage();
+            } else if (state is UserState) {
+              return UsermanagementPage();
+            } else if (state is ContactState) {
+              return ContactPage();
+            } else {
+              // A more robust fallback for unknown states
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error, color: Colors.red, size: 50),
+                    SizedBox(height: 20),
+                    Text('Unknown State',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Optionally provide a way to navigate back or refresh the state
+                        Navigator.pop(
+                            context); // Example: Go back to the previous screen
+                      },
+                      child: Text('Go Back'),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
         ),
-      );
-    }
-  },
-),
         bottomNavigationBar: BlocBuilder<NavigationBloc, NavigationState>(
           builder: (context, state) {
             int currentIndex = 1; // Default to HomeState
@@ -456,9 +417,10 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget _buildNavBarItem(
-      IconData icon, String label, int index, int currentIndex) {
-    return GestureDetector(
+  Widget _buildNavBarItem(IconData icon, String label, int index, int currentIndex) {
+  return Expanded(
+    child: GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         switch (index) {
           case 0:
@@ -472,38 +434,43 @@ class _MainPageState extends State<MainPage> {
             break;
         }
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              AnimatedContainer(
-                duration: Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                width: currentIndex == index ? 50 : 0,
-                height: currentIndex == index ? 50 : 0,
-                decoration: BoxDecoration(
-                  color: currentIndex == index
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
+      child: Container(
+        // Expand the entire width of the navbar item
+        width: double.infinity,
+        height: 70, // Match the navbar height
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  width: currentIndex == index ? 50 : 0,
+                  height: currentIndex == index ? 50 : 0,
+                  decoration: BoxDecoration(
+                    color: currentIndex == index
+                        ? Colors.white.withOpacity(0.2)
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              Icon(
-                icon,
-                color: currentIndex == index ? Colors.black : Colors.white,
-              ),
-            ],
-          ),
-          SizedBox(height: 4),
-        ],
+                Icon(
+                  icon,
+                  color: currentIndex == index ? Colors.black : Colors.white,
+                  
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    );
-  }
-  
+    ),
+  );
 }
-
+}
 
 Future<void> requestManageExternalStoragePermission() async {
   var status = await Permission.manageExternalStorage.request();

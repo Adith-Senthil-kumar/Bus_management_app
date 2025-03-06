@@ -20,14 +20,34 @@ class _ContactPageState extends State<ContactPage> {
     _fetchContacts(); // Fetch contacts when the page is loaded
   }
 
-  // Function to fetch contacts from Firestore
   Future<void> _fetchContacts() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    QuerySnapshot snapshot = await firestore.collection('contacts').get();
-    setState(() {
-      _contacts = snapshot.docs;
-    });
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  try {
+    // Try reading from cache first
+    QuerySnapshot snapshot = await firestore
+        .collection('contacts')
+        .get(const GetOptions(source: Source.cache));
+
+    if (snapshot.docs.isNotEmpty) {
+      setState(() {
+        _contacts = snapshot.docs;
+      });
+      return; // Stop here if cache has data
+    }
+  } catch (e) {
+    print('Cache miss, fetching from server...');
   }
+
+  // If cache fails, fetch fresh data
+  QuerySnapshot snapshot = await firestore
+      .collection('contacts')
+      .get();
+
+  setState(() {
+    _contacts = snapshot.docs;
+  });
+}
 
   // Function to add a new contact to Firestore
   Future<void> _addContact(String position, String name, String phone) async {

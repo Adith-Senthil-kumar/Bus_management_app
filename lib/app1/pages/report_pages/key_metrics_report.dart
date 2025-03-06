@@ -36,15 +36,15 @@ class KeyMetricsReport extends StatelessWidget {
 
   // Build Total Buses KPI Card with dynamic count
   Widget _buildTotalBusesKpiCard() {
-    return FutureBuilder<int>(
-      future: _getTotalBusesCount(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('buses').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          return _buildKpiCard('Total Buses', snapshot.data.toString(), 'Total number of buses in the system');
+          return _buildKpiCard('Total Buses', snapshot.data?.size.toString() ?? '0', 'Total number of buses in the system');
         }
       },
     );
@@ -52,15 +52,15 @@ class KeyMetricsReport extends StatelessWidget {
 
   // Build Active Buses KPI Card with dynamic count from drivers collection
   Widget _buildActiveBusesKpiCard() {
-    return FutureBuilder<int>(
-      future: _getActiveBusesCount(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('assignedbus').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          return _buildKpiCard('Active Buses', snapshot.data.toString(), 'Number of buses currently in operation');
+          return _buildKpiCard('Active Buses', snapshot.data?.size.toString() ?? '0', 'Number of buses currently in operation');
         }
       },
     );
@@ -68,15 +68,15 @@ class KeyMetricsReport extends StatelessWidget {
 
   // Build Total Students KPI Card with dynamic count
   Widget _buildTotalStudentsKpiCard() {
-    return FutureBuilder<int>(
-      future: _getTotalStudentsCount(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('students').where('present', isEqualTo: true).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          return _buildKpiCard('Total Students', snapshot.data.toString(), 'Total number of students in the system');
+          return _buildKpiCard('Total Students', snapshot.data?.size.toString() ?? '0', 'Total number of students in the system');
         }
       },
     );
@@ -84,42 +84,18 @@ class KeyMetricsReport extends StatelessWidget {
 
   // Build Total Drivers KPI Card with dynamic count
   Widget _buildTotalDriversKpiCard() {
-    return FutureBuilder<int>(
-      future: _getTotalDriversCount(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('drivers').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          return _buildKpiCard('Total Drivers', snapshot.data.toString(), 'Total number of drivers in the system');
+          return _buildKpiCard('Total Drivers', snapshot.data?.size.toString() ?? '0', 'Total number of drivers in the system');
         }
       },
     );
-  }
-
-  // Function to fetch total buses count from Firestore
-  Future<int> _getTotalBusesCount() async {
-    AggregateQuerySnapshot snapshot = await FirebaseFirestore.instance.collection('buses').count().get();
-    return snapshot.count ?? 0; // Provide a default value of 0 if null
-  }
-
-  // Function to fetch active buses count from drivers collection in Firestore
-  Future<int> _getActiveBusesCount() async {
-    AggregateQuerySnapshot snapshot = await FirebaseFirestore.instance.collection('drivers').count().get();
-    return snapshot.count ?? 0; // Provide a default value of 0 if null
-  }
-
-  // Function to fetch total students count from Firestore
-  Future<int> _getTotalStudentsCount() async {
-    AggregateQuerySnapshot snapshot = await FirebaseFirestore.instance.collection('students').count().get();
-    return snapshot.count ?? 0; // Provide a default value of 0 if null
-  }
-
-  // Function to fetch total drivers count from Firestore
-  Future<int> _getTotalDriversCount() async {
-    AggregateQuerySnapshot snapshot = await FirebaseFirestore.instance.collection('drivers').count().get();
-    return snapshot.count ?? 0; // Provide a default value of 0 if null
   }
 
   Widget _buildKpiCard(String title, String value, String subtitle) {

@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'navigation_event.dart';
-import 'navigation_state.dart';
+import 'package:busbuddy/app3/blocs/navigation_event.dart';
+import 'package:busbuddy/app3/blocs/navigation_state.dart';
 
 class NavigationBloc extends Bloc<NavigationEvent, NavigationState> {
-  NavigationBloc() : super(HomeState()) {
+  NavigationBloc() : super(Home2State()) {
     // Map navigation events to their respective states
-    on<NavigateToHome>((event, emit) => emit(HomeState()));
+    on<NavigateToHome2>((event, emit) => emit(Home2State()));
     on<NavigateToaccount>((event, emit) => emit(accountState()));
     on<NavigateTocontacts>((event, emit) => emit(contactsState()));
     on<NavigateTofeedback>((event, emit) => emit(feedbackState()));

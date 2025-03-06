@@ -39,7 +39,7 @@ class AccountPage extends StatelessWidget {
 
     return WillPopScope(
       onWillPop: () async {
-        context.read<NavigationBloc>().add(NavigateToHome());
+        context.read<NavigationBloc>().add(NavigateToHome1());
         Navigator.pop(context);
         return Future.value(false);
       },
@@ -66,7 +66,7 @@ class AccountPage extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              context.read<NavigationBloc>().add(NavigateToHome());
+              context.read<NavigationBloc>().add(NavigateToHome1());
               Navigator.pop(context);
             },
           ),
@@ -91,11 +91,7 @@ class AccountPage extends StatelessWidget {
             final student = snapshot.data!.docs.first;
             final data = student.data() as Map<String, dynamic>;
 
-            // Decode base64 image
-            Uint8List? imageBytes;
-            if (data['imageBase64'] != null) {
-              imageBytes = base64Decode(data['imageBase64']);
-            }
+            
 
             // Define the desired order with human-readable labels
             final fieldLabels = {
@@ -127,21 +123,7 @@ class AccountPage extends StatelessWidget {
 
             return Column(
               children: [
-                SizedBox(height: 20),
-                // Circle with the base64 image
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.blueAccent,
-                  backgroundImage:
-                      imageBytes != null ? MemoryImage(imageBytes) : null,
-                  child: imageBytes == null
-                      ? Icon(
-                          Icons.person,
-                          size: 50,
-                          color: Colors.white,
-                        )
-                      : null,
-                ),
+                
                 SizedBox(height: 20),
                 Expanded(
                   child: Padding(

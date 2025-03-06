@@ -1,0 +1,2 @@
+/Users/adiths/Internship/busbuddy/android/app/.cxx/RelWithDebInfo/ps635m3a/x86/CMakeFiles/edit_cache.dir
+/Users/adiths/Internship/busbuddy/android/app/.cxx/RelWithDebInfo/ps635m3a/x86/CMakeFiles/rebuild_cache.dir
