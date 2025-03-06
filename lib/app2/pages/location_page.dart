@@ -59,12 +59,12 @@ class LocationPage extends StatelessWidget {
               }
 
               final busData = busSnapshot.data!.data() as Map<String, dynamic>;
-              final driverId = busData['driverId'] ?? 'No driver assigned';
+              final driverEmail = busData['driverEmail'] ?? 'No driver assigned';
 
               return StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('stops_status')
-                    .where('driverId', isEqualTo: driverId)
+                    .where('driverEmail', isEqualTo: driverEmail)
                     .snapshots(),
                 builder: (context, stopsStatusSnapshot) {
                   if (stopsStatusSnapshot.connectionState == ConnectionState.waiting) {

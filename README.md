@@ -55,10 +55,10 @@ Admin Portal
 <div align="center">
   <table>
     <tr>
-      <td><img src="assets/2.jpeg" width="200"/></td>
-      <td><img src="assets/3.jpeg" width="200"/></td>
-      <td><img src="assets/4.jpeg" width="200"/></td>
-      <td><img src="assets/5.jpeg" width="200"/></td>
+      <td><img src="assets/a1.jpeg" width="200"/></td>
+      <td><img src="assets/a2.jpeg" width="200"/></td>
+      <td><img src="assets/a3.jpeg" width="200"/></td>
+      <td><img src="assets/a4.jpeg" width="200"/></td>
     </tr>
   </table>
 </div>  

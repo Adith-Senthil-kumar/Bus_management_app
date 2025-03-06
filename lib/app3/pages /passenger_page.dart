@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:convert';
-import 'dart:typed_data';
 
 class PassengerPage extends StatefulWidget {
   @override
@@ -37,46 +35,36 @@ class _PassengerPageState extends State<PassengerPage> {
     }
   }
 
-  // Get the assigned bus ID for the driver
-  Future<String?> getAssignedBusId(String driverId) async {
-    try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('assignedbus')
-          .where('driverId', isEqualTo: driverId)
-          .limit(1)
-          .get();
-
+  // Stream to get the assigned bus ID for the driver
+  Stream<String?> getAssignedBusIdStream(String driverId) {
+    return FirebaseFirestore.instance
+        .collection('assignedbus')
+        .where('driverId', isEqualTo: driverId)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) {
       if (snapshot.docs.isNotEmpty) {
         return snapshot.docs.first.id; // Return the assigned bus ID
       } else {
-        throw Exception("No assigned bus found for the driver");
+        return null;
       }
-    } catch (e) {
-      print("Error fetching assigned bus ID: $e");
-      return null;
-    }
+    });
   }
 
-  // Fetch all students with the same assignedBusId as the driver
-  Future<List<Map<String, dynamic>>> getStudentsByAssignedBus(
-      String assignedBusId) async {
-    try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('students')
-          .where('assignedBusId', isEqualTo: assignedBusId)
-          .get();
-
-      // Extract and return the list of student data (including 'name' and 'present')
+  // Stream to fetch all students with the same assignedBusId as the driver
+  Stream<List<Map<String, dynamic>>> getStudentsByAssignedBusStream(
+      String assignedBusId) {
+    return FirebaseFirestore.instance
+        .collection('students')
+        .where('assignedBusId', isEqualTo: assignedBusId)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs
           .map((doc) => doc.data() as Map<String, dynamic>)
           .toList();
-    } catch (e) {
-      print("Error fetching students: $e");
-      return []; // Return an empty list if there's an error
-    }
+    });
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,8 +82,8 @@ class _PassengerPageState extends State<PassengerPage> {
           }
 
           final String driverId = driverIdSnapshot.data!;
-          return FutureBuilder<String?>(
-            future: getAssignedBusId(driverId),
+          return StreamBuilder<String?>(
+            stream: getAssignedBusIdStream(driverId),
             builder: (context, assignedBusIdSnapshot) {
               if (assignedBusIdSnapshot.connectionState ==
                   ConnectionState.waiting) {
@@ -109,8 +97,8 @@ class _PassengerPageState extends State<PassengerPage> {
               }
 
               final String assignedBusId = assignedBusIdSnapshot.data!;
-              return FutureBuilder<List<Map<String, dynamic>>>(
-                future: getStudentsByAssignedBus(assignedBusId),
+              return StreamBuilder<List<Map<String, dynamic>>>(
+                stream: getStudentsByAssignedBusStream(assignedBusId),
                 builder: (context, studentsSnapshot) {
                   if (studentsSnapshot.connectionState ==
                       ConnectionState.waiting) {
@@ -132,7 +120,6 @@ class _PassengerPageState extends State<PassengerPage> {
                       final student = students[index];
                       final studentName = student['name'] ?? 'N/A';
                       final bool isPresent = student['present'] ?? false;
-                     
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -141,7 +128,6 @@ class _PassengerPageState extends State<PassengerPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListTile(
-                          
                           title: Text(
                             studentName,
                             style: const TextStyle(
